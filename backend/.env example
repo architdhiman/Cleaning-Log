@@ -1,0 +1,4 @@
+DATABASE_URL="postgresql://postgres:<password>@localhost:5432/cleen_db"
+JWT_SECRET="your-super-secret-cleaning-log-key"
+u = archit
+p = admin123

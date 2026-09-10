@@ -1,4 +1,5 @@
 import { prisma } from "../lib/prisma.js";
+import { EQUIPMENT_STATUS } from "../constants/equipment.constants.js";
 
 export async function getAllEquipment() {
   return prisma.equipment.findMany({
@@ -11,7 +12,7 @@ export async function getAllEquipment() {
 export async function createEquipment(
   name: string,
   code: string,
-  status: "ACTIVE" | "RETIRED" = "ACTIVE",
+  status: typeof EQUIPMENT_STATUS[keyof typeof EQUIPMENT_STATUS] = EQUIPMENT_STATUS.ACTIVE,
 ) {
   return prisma.equipment.create({
     data: {
@@ -26,7 +27,7 @@ export async function updateEquipment(
   id: number,
   name: string,
   code: string,
-  status: "ACTIVE" | "RETIRED",
+  status: typeof EQUIPMENT_STATUS[keyof typeof EQUIPMENT_STATUS],
 ) {
   return prisma.equipment.update({
     where: { id },

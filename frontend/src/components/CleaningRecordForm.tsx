@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import type { CleaningRecord } from "../types";
 
 interface Props {
@@ -7,26 +7,25 @@ interface Props {
   onSaved: () => void;
   onCancel: () => void;
   onCreate: (
-    equipmentId: number,
-    data: {
-  cleanedBy: string;
-  cleanedAt: string;
-  method: string;
-  notes?: string;
-  status?: "PENDING" | "VERIFIED";
-},
-  ) => Promise<void>;
+  equipmentId: number,
+  data: {
+    cleanedAt: string;
+    method: string;
+    notes?: string;
+    status?: "PENDING" | "VERIFIED";
+  },
+) => Promise<void>;
   onUpdate: (
-    id: number,
-    data: {
-      cleanedBy?: string;
-      cleanedAt?: string;
-      method?: string;
-      notes?: string;
-      status?: "PENDING" | "VERIFIED";
-      changedBy?: string;
-    },
-  ) => Promise<void>;
+  id: number,
+  data: {
+    cleanedBy?: string;
+    cleanedAt?: string;
+    method?: string;
+    notes?: string;
+    status?: "PENDING" | "VERIFIED";
+    changedBy?: string;
+  },
+) => Promise<void>;
 }
 
 function CleaningRecordForm({
@@ -39,24 +38,21 @@ function CleaningRecordForm({
 }: Props) {
   const isEditing = Boolean(record);
 
-  const [cleanedBy, setCleanedBy] = useState("");
   const [cleanedAt, setCleanedAt] = useState("");
   const [method, setMethod] = useState("");
   const [notes, setNotes] = useState("");
   const [status, setStatus] = useState<"PENDING" | "VERIFIED">(
     "PENDING",
   );
-  const [changedBy, setChangedBy] = useState("");
 
   useEffect(() => {
     if (record) {
-      setCleanedBy(record.cleanedBy);
+      
       setCleanedAt(record.cleanedAt.slice(0, 16));
       setMethod(record.method);
       setNotes(record.notes ?? "");
       setStatus(record.status);
     } else {
-      setCleanedBy("");
       setCleanedAt("");
       setMethod("");
       setNotes("");
@@ -67,27 +63,24 @@ function CleaningRecordForm({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
-    if (!cleanedBy || !cleanedAt || !method) {
+    if (!cleanedAt || !method) {
       return;
     }
 
     if (isEditing && record) {
       await onUpdate(record.id, {
-        cleanedBy,
-        cleanedAt: new Date(cleanedAt).toISOString(),
-        method,
-        notes,
-        status,
-        changedBy: cleanedBy,
-      });
+  cleanedAt: new Date(cleanedAt).toISOString(),
+  method,
+  notes,
+  status,
+});
     } else {
       await onCreate(equipmentId, {
-        cleanedBy,
-        cleanedAt: new Date(cleanedAt).toISOString(),
-        method,
-        notes,
-        status,
-      });
+  cleanedAt: new Date(cleanedAt).toISOString(),
+  method,
+  notes,
+  status,
+});
     }
 
     onSaved();
@@ -102,14 +95,7 @@ function CleaningRecordForm({
             : "Add Cleaning Record"}
         </h2>
 
-        <label>
-          Cleaned By
-          <input
-            value={cleanedBy}
-            onChange={(e) => setCleanedBy(e.target.value)}
-            required
-          />
-        </label>
+        
 
         <label>
           Cleaned At
@@ -154,17 +140,7 @@ function CleaningRecordForm({
           </select>
         </label>
 
-        {isEditing && (
-          <label>
-            Changed By
-            <input
-              value={changedBy}
-              onChange={(e) => setChangedBy(e.target.value)}
-              placeholder="Your name"
-              required
-            />
-          </label>
-        )}
+        
 
         <div className="form-actions">
           <button type="button" onClick={onCancel}>

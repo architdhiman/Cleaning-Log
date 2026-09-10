@@ -14,10 +14,15 @@ import {
   updateCleaningRecord,
 } from "./api/equipment";
 import { formatDate } from "./utils/date";
+import Login from "./components/Login";
 
 import CleaningRecordForm from "./components/CleaningRecordForm";
 
 function App() {
+  const [isLoggedIn, setIsLoggedIn] = useState(
+    Boolean(localStorage.getItem("token")),
+  );
+
   const [showForm, setShowForm] = useState(false);
   const [editingRecord, setEditingRecord] =
     useState<CleaningRecord | null>(null);
@@ -70,31 +75,28 @@ function App() {
   }
 
   async function handleCreateRecord(
-    equipmentId: number,
-    data: {
-      cleanedBy: string;
-      cleanedAt: string;
-      method: string;
-      notes?: string;
-      status?: "PENDING" | "VERIFIED";
-    },
-  ) {
-    await createCleaningRecord(equipmentId, data);
-  }
+  equipmentId: number,
+  data: {
+    cleanedAt: string;
+    method: string;
+    notes?: string;
+    status?: "PENDING" | "VERIFIED";
+  },
+) {
+  await createCleaningRecord(equipmentId, data);
+}
 
   async function handleUpdateRecord(
-    id: number,
-    data: {
-      cleanedBy?: string;
-      cleanedAt?: string;
-      method?: string;
-      notes?: string;
-      status?: "PENDING" | "VERIFIED";
-      changedBy?: string;
-    },
-  ) {
-    await updateCleaningRecord(id, data);
-  }
+  id: number,
+  data: {
+    cleanedAt?: string;
+    method?: string;
+    notes?: string;
+    status?: "PENDING" | "VERIFIED";
+  },
+) {
+  await updateCleaningRecord(id, data);
+}
 
   async function handleViewAudit(recordId: number) {
     try {
@@ -106,12 +108,28 @@ function App() {
       console.error("Failed to load audit logs:", error);
     }
   }
+  
 
+  if (!isLoggedIn) {
+  return <Login onLogin={() => setIsLoggedIn(true)} />;
+}
   return (
+    
     <div className="app">
       <header className="header">
-        <h1>Equipment Cleaning Log</h1>
-      </header>
+
+  
+    <h1>Equipment Cleaning Log</h1>
+    <button
+    onClick={() => {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      setIsLoggedIn(false);
+    }}
+    >
+    Logout
+  </button>
+</header>
 
       <main className="layout">
         {/* Equipment */}

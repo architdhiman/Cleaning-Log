@@ -1,11 +1,16 @@
 import { prisma } from "../lib/prisma.js";
 import { getAuditChanges } from "../utils/auditDiff.js";
+import {
+  CLEANING_AUDIT_FIELDS,
+  CLEANING_STATUS,
+} from "../constants/cleaning.constants.js";
+
 
 export async function getCleaningRecords(
   equipmentId: number,
   page: number,
   limit: number,
-  status?: "PENDING" | "VERIFIED",
+  status?: typeof CLEANING_STATUS[keyof typeof CLEANING_STATUS],
 ) {
   const skip = (page - 1) * limit;
 
@@ -47,7 +52,7 @@ export async function createCleaningRecord(
     cleanedAt: Date;
     method: string;
     notes?: string;
-    status?: "PENDING" | "VERIFIED";
+    status?: typeof CLEANING_STATUS[keyof typeof CLEANING_STATUS];
   },
   changedBy: string,
 ) {
@@ -55,7 +60,7 @@ export async function createCleaningRecord(
     const record = await tx.cleaningRecord.create({
       data: {
         ...data,
-        status: data.status ?? "PENDING",
+        status: data.status ?? CLEANING_STATUS.PENDING,
       },
     });
 
@@ -127,7 +132,7 @@ export async function updateCleaningRecord(
     const changes = getAuditChanges(
   existing,
   data,
-  ["cleanedBy", "cleanedAt", "method", "notes", "status"],
+  [...CLEANING_AUDIT_FIELDS],
 );
 
     const updatedRecord = await tx.cleaningRecord.update({

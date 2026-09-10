@@ -1,4 +1,3 @@
-import axios from "axios";
 import type {
   Equipment,
   CleaningRecord,
@@ -6,13 +5,34 @@ import type {
   Pagination,
 } from "../types";
 
-const api = axios.create({
-  baseURL: "http://localhost:5000/api",
-});
+import { baseURL } from "../utils/date";
+
+async function request<T>(
+  path: string,
+  options: RequestInit = {},
+): Promise<T> {
+  const token = localStorage.getItem("token");
+
+  const headers = new Headers(options.headers);
+
+  if (token) {
+    headers.set("Authorization", `Bearer ${token}`);
+  }
+
+  const response = await fetch(`${baseURL}${path}`, {
+    ...options,
+    headers,
+  });
+
+  if (!response.ok) {
+    throw new Error(`API request failed: ${response.status}`);
+  }
+
+  return response.json() as Promise<T>;
+}
 
 export async function getEquipment(): Promise<Equipment[]> {
-  const response = await api.get<Equipment[]>("/equipment");
-  return response.data;
+  return request<Equipment[]>("/equipment");
 }
 
 export async function getCleaningRecords(
@@ -24,63 +44,51 @@ export async function getCleaningRecords(
   records: CleaningRecord[];
   pagination: Pagination;
 }> {
-  const response = await api.get(
-    `/equipment/${equipmentId}/records`,
-    {
-      params: {
-        page,
-        limit,
-        status,
-      },
-    },
-  );
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+  });
+  if (status) params.set("status", status);
 
-  return response.data;
+  return request<{ records: CleaningRecord[]; pagination: Pagination }>(
+    `/equipment/${equipmentId}/records?${params.toString()}`,
+  );
 }
 
 export async function createCleaningRecord(
   equipmentId: number,
   data: {
-    cleanedBy: string;
-    cleanedAt: string;
-    method: string;
-    notes?: string;
-    status?: "PENDING" | "VERIFIED";
-  },
+  cleanedAt: string;
+  method: string;
+  notes?: string;
+  status?: "PENDING" | "VERIFIED";
+},
 ): Promise<CleaningRecord> {
-  const response = await api.post(
-    `/equipment/${equipmentId}/records`,
-    data,
-  );
-
-  return response.data;
+  return request<CleaningRecord>(`/equipment/${equipmentId}/records`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 }
 
 export async function updateCleaningRecord(
   id: number,
   data: {
-    cleanedBy?: string;
-    cleanedAt?: string;
-    method?: string;
-    notes?: string;
-    status?: "PENDING" | "VERIFIED";
-    changedBy?: string;
-  },
+  cleanedAt?: string;
+  method?: string;
+  notes?: string;
+  status?: "PENDING" | "VERIFIED";
+},
 ): Promise<CleaningRecord> {
-  const response = await api.put(
-    `/equipment/records/${id}`,
-    data,
-  );
-
-  return response.data;
+  return request<CleaningRecord>(`/equipment/records/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(data),
+  });
 }
 
 export async function getAuditLogs(
   recordId: number,
 ): Promise<AuditLog[]> {
-  const response = await api.get(
-    `/equipment/records/${recordId}/audit`,
-  );
-
-  return response.data;
+  return request<AuditLog[]>(`/equipment/records/${recordId}/audit`);
 }

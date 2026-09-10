@@ -1,0 +1,29 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: cleen-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: cleen_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+
+  backend:
+    build:
+      context: ./backend
+    container_name: cleen-backend
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    environment:
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/cleen_db
+      JWT_SECRET: your-super-secret-cleaning-log-key
+    ports:
+      - "5000:5000"
+
+volumes:
+  postgres_data:

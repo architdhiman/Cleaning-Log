@@ -1,19 +1,25 @@
-import type { Request, Response } from "express";
+import type { Response } from "express";
+import type { AuthRequest } from "../middleware/auth.js";
 import {
   getCleaningRecords,
   createCleaningRecord as createCleaningRecordService,
   updateCleaningRecord as updateCleaningRecordService,
   getAuditHistory,
 } from "../services/cleaningRecord.service.js";
+import {
+  DEFAULT_PAGE,
+  DEFAULT_LIMIT,
+  CLEANING_STATUS,
+} from "../constants/cleaning.constants.js";
 
-export async function getRecords(req: Request, res: Response) {
+export async function getRecords(req: AuthRequest, res: Response) {
   try {
     const equipmentId = Number(req.params.equipmentId);
-    const page = Number(req.query.page) || 1;
-    const limit = Number(req.query.limit) || 10;
+    const page = Number(req.query.page) || DEFAULT_PAGE;
+    const limit = Number(req.query.limit) || DEFAULT_LIMIT;
 
     const status =
-      req.query.status === "PENDING" || req.query.status === "VERIFIED"
+      req.query.status === CLEANING_STATUS.PENDING || req.query.status === CLEANING_STATUS.VERIFIED
         ? req.query.status
         : undefined;
 
@@ -34,37 +40,36 @@ export async function getRecords(req: Request, res: Response) {
   }
 }
 
-export async function createCleaningRecord(req: Request, res: Response) {
+export async function createCleaningRecord(
+  req: AuthRequest,
+  res: Response,
+) {
   try {
     const equipmentId = Number(req.params.equipmentId);
 
-    const {
-  cleanedBy,
-  cleanedAt,
-  method,
-  notes,
-  status,
-  changedBy,
-} = req.body;
+const { cleanedAt, method, notes, status } = req.body;
 
-    if (!cleanedBy || !cleanedAt || !method) {
-      return res.status(400).json({
-        message: "cleanedBy, cleanedAt and method are required",
-      });
-    }
+const user = req.user;
 
-    const record = await createCleaningRecordService({
-      equipmentId,
-      cleanedBy,
-      cleanedAt: new Date(cleanedAt),
-      method,
-      notes,
-      status,
-    },
-    changedBy || cleanedBy
-  );
+if (!user) {
+  return res.status(401).json({
+    message: "Authentication required",
+  });
+}
 
-    res.status(201).json(record);
+const record = await createCleaningRecordService(
+  {
+    equipmentId,
+    cleanedBy: user.name,
+    cleanedAt: new Date(cleanedAt),
+    method,
+    notes,
+    status,
+  },
+  user.name,
+);
+
+res.status(201).json(record);
   } catch (error) {
     console.error(error);
 
@@ -75,32 +80,31 @@ export async function createCleaningRecord(req: Request, res: Response) {
 }
 
 export async function updateCleaningRecord(
-  req: Request,
+  req: AuthRequest,
   res: Response,
 ) {
   try {
     const id = Number(req.params.id);
 
-    const {
-      cleanedBy,
-      cleanedAt,
-      method,
-      notes,
-      status,
-      changedBy,
-    } = req.body;
+    const { cleanedAt, method, notes, status } = req.body;
+    const user = req.user;
+
+if (!user) {
+  return res.status(401).json({
+    message: "Authentication required",
+  });
+}
 
     const record = await updateCleaningRecordService(
-      id,
-      {
-        ...(cleanedBy !== undefined ? { cleanedBy } : {}),
-        ...(cleanedAt ? { cleanedAt: new Date(cleanedAt) } : {}),
-        ...(method !== undefined ? { method } : {}),
-        ...(notes !== undefined ? { notes } : {}),
-        ...(status !== undefined ? { status } : {}),
-      },
-      changedBy || "system",
-    );
+  id,
+  {
+    ...(cleanedAt ? { cleanedAt: new Date(cleanedAt) } : {}),
+    method,
+    notes,
+    status,
+  },
+  user.name,
+);
 
     res.json(record);
   } catch (error) {
@@ -118,7 +122,7 @@ export async function updateCleaningRecord(
   }
 }
 
-export async function getAuditLogs(req: Request, res: Response) {
+export async function getAuditLogs(req: AuthRequest, res: Response) {
   try {
     const id = Number(req.params.id);
 
