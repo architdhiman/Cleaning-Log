@@ -1,0 +1,283 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f5f6f8;
+  color: #222;
+}
+
+button,
+select {
+  font: inherit;
+}
+
+.app {
+  min-height: 100vh;
+}
+
+.header {
+  padding: 20px 32px;
+  background: #302121;
+  border-bottom: 1px solid #ddd;
+}
+
+.header h1 {
+  margin: 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  min-height: calc(100vh - 80px);
+}
+
+.equipment-panel {
+  padding: 24px;
+  background: #fff;
+  border-right: 1px solid #ddd;
+}
+
+.equipment-panel h2 {
+  margin-top: 0;
+}
+
+.equipment-item {
+  display: block;
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 10px;
+  text-align: left;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.equipment-item.selected {
+  border: 2px solid #333;
+}
+
+.equipment-item strong,
+.equipment-item span,
+.equipment-item small {
+  display: block;
+}
+
+.equipment-item span {
+  margin-top: 4px;
+  color: #666;
+}
+
+.equipment-item small {
+  margin-top: 6px;
+}
+
+.records-panel {
+  padding: 28px;
+}
+
+.records-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.records-header h2 {
+  margin-bottom: 4px;
+}
+
+.records-header p {
+  margin-top: 0;
+  color: #666;
+}
+
+.primary-button {
+  padding: 10px 16px;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  background: #222;
+  color: white;
+}
+
+.filters {
+  margin: 20px 0;
+}
+
+.filters select {
+  margin-left: 8px;
+  padding: 6px;
+}
+
+.record-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 18px;
+  margin-bottom: 12px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.record-card p {
+  margin: 7px 0;
+  color: #666;
+}
+
+.status {
+  padding: 5px 9px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.status.pending {
+  background: #fff3cd;
+}
+
+.status.verified {
+  background: #d1e7dd;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+.pagination button {
+  padding: 7px 14px;
+  cursor: pointer;
+}
+
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.form-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.record-form {
+  width: 450px;
+  padding: 24px;
+  background: white;
+  border-radius: 10px;
+}
+
+.record-form h2 {
+  margin-top: 0;
+  color: black
+}
+
+.record-form label {
+  display: block;
+  margin-bottom: 14px;
+  font-weight: bold;
+}
+
+.record-form input,
+.record-form textarea,
+.record-form select {
+  display: block;
+  width: 100%;
+  margin-top: 6px;
+  padding: 9px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.record-form textarea {
+  min-height: 80px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.audit-entry {
+  padding: 12px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.audit-entry p {
+  margin: 6px 0;
+}
+
+.audit-entry small {
+  color: #666;
+}
+
+.audit-modal {
+  width: 600px;
+  max-width: 90vw;
+  max-height: 80vh;
+  background: white;
+  border-radius: 10px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.audit-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 22px;
+  /* border-bottom: 1px solid #ddd; */
+  flex-shrink: 0;
+}
+
+.audit-header h2 {
+  color: #222;
+  margin: 0;
+}
+
+.close-button {
+  width: 34px;
+  height: 34px;
+  border: 1px solid #ccc;
+  /* background: transparent; */
+  font-size: 28px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.close-button:hover {
+  background: black;
+}
+
+.audit-content {
+  padding: 0 22px;
+  overflow-y: auto;
+}
+
+.audit-entry {
+  padding: 16px 0;
+  border-bottom: 1px solid #ddd;
+}
+
+.audit-entry p {
+  margin: 8px 0;
+  word-break: break-word;
+}
+
+.audit-entry small {
+  color: #666;
+}
